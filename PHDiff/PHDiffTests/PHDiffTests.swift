@@ -154,13 +154,13 @@ final class PHDiffTests: XCTestCase {
 
     func testUpdateWithInvalidIndex() {
         let steps: [DiffStep<String>] = [
-            .update(value: "a", index: 4),
+        .update(value: "a", index: 4, oldIndex: 4),
             ]
         do {
             let _ = try [ "a", "b", "c", "d" ].apply(steps: steps)
             XCTAssert(false)
         } catch DiffError<String>.failApplyDiffStep(step: let step) {
-            XCTAssertEqual(step, DiffStep.update(value: "a", index: 4))
+            XCTAssertEqual(step, DiffStep.update(value: "a", index: 4, oldIndex: 4))
         } catch _ {
             XCTAssert(false)
         }
@@ -175,7 +175,22 @@ final class PHDiffTests: XCTestCase {
         oldArray = [TestUser(name: "1", age: 0), TestUser(name: "2", age: 0)]
         newArray = [TestUser(name: "1", age: 0), TestUser(name: "2", age: 1)]
         steps = newArray.difference(from: oldArray)
-        expectedSteps = [.update(value: TestUser(name: "2", age: 1), index: 1)]
+        expectedSteps = [.update(value: TestUser(name: "2", age: 1), index: 1, oldIndex: 1)]
+        XCTAssertTrue(steps == expectedSteps)
+        XCTAssertEqual(try! oldArray.apply(steps: steps), newArray, "simple update")
+    }
+    
+    func testDiffUpdateWithInsert() {
+        var oldArray: [TestUser] = []
+        var newArray: [TestUser] = []
+        var steps: [DiffStep<TestUser>] = []
+        var expectedSteps: [DiffStep<TestUser>] = []
+        
+        oldArray = [TestUser(name: "1", age: 0), TestUser(name: "2", age: 0)]
+        newArray = [TestUser(name: "1", age: 0), TestUser(name: "3", age: 0), TestUser(name: "2", age: 1)]
+        steps = newArray.difference(from: oldArray)
+        expectedSteps = [.insert(value: TestUser(name: "3", age: 0), index:1),
+                         .update(value: TestUser(name: "2", age: 1), index: 2, oldIndex: 1)]
         XCTAssertTrue(steps == expectedSteps)
         XCTAssertEqual(try! oldArray.apply(steps: steps), newArray, "simple update")
     }

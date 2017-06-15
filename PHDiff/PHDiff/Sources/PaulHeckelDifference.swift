@@ -39,7 +39,7 @@ internal func PaulHeckelDifference<T: Diffable>(between fromArray: [T], and toAr
             }
             // Check if this object has changed
             if toArray[i] != fromArray[j] {
-                steps.append(.update(value: toArray[i], index: i))
+                steps.append(.update(value: toArray[i], index: i, oldIndex: j))
             }
         } else {
             steps.append(.insert(value: toArray[i], index: i))

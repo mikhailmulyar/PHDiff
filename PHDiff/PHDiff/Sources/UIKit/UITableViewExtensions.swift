@@ -30,8 +30,8 @@ public extension UITableView {
                     at: IndexPath(row: fromIndex, section: section),
                     to: IndexPath(row: toIndex, section: section)
                 )
-            case let .update(_, index):
-                reloads.append(IndexPath(row: index, section: 0))
+            case let .update(_, _, oldIndex):
+                reloads.append(IndexPath(row: oldIndex, section: 0))
             }
         }
 

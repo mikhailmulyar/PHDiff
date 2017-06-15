@@ -90,7 +90,7 @@ extension Array where Element: Diffable {
 
         for step in steps {
             switch step {
-            case let .update(value: value, index: index):
+            case let .update(value: value, index: index, _):
                 if index >= newArray.count {
                     throw DiffError.failApplyDiffStep(step: step)
                 }

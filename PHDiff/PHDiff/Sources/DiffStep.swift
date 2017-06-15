@@ -12,7 +12,8 @@ public enum DiffStep<T: Diffable> {
     case insert(value: T, index: Int)
     case delete(value: T, index: Int)
     case move(value: T, fromIndex: Int, toIndex: Int)
-    case update(value: T, index: Int)
+    //Added oldIndex since UICollectionView/UITableView batch update uses old index of value for reload
+    case update(value: T, index: Int, oldIndex: Int)
 
     public var isInsert: Bool {
         switch self {
@@ -48,7 +49,7 @@ public enum DiffStep<T: Diffable> {
         case let .insert(value, _): return value
         case let .delete(value, _): return value
         case let .move(value, _, _): return value
-        case let .update(value, _): return value
+        case let .update(value, _, _): return value
         }
     }
 
@@ -58,7 +59,7 @@ public enum DiffStep<T: Diffable> {
         case let .insert(_, index): return index
         case let .delete(_, index): return index
         case let .move(_, _, toIndex): return toIndex
-        case let .update(_, index): return index
+        case let .update(_, index, _): return index
         }
     }
 }
@@ -73,8 +74,8 @@ public func ==<T>(lhs: DiffStep<T>, rhs: DiffStep<T>) -> Bool {
         return lhsValue == rhsValue && lhsIndex == rhsIndex
     case let (.move(lhsValue, lhsFromIndex, lhsToIndex), .move(rhsValue, rhsFromIndex, rhsToIndex)):
         return lhsValue == rhsValue && lhsFromIndex == rhsFromIndex && lhsToIndex == rhsToIndex
-    case let (.update(lhsValue, lhsIndex), .update(rhsValue, rhsIndex)):
-        return lhsValue == rhsValue && lhsIndex == rhsIndex
+    case let (.update(lhsValue, lhsIndex, lhsOldIndex), .update(rhsValue, rhsIndex, rhsOldIndex)):
+        return lhsValue == rhsValue && lhsIndex == rhsIndex && lhsOldIndex == rhsOldIndex
     default:
         return false
     }
@@ -90,8 +91,8 @@ extension DiffStep: CustomStringConvertible {
             return "Delete \(value) at index: \(index)"
         case let .move(value, fromIndex, toIndex):
             return "Move \(value) from index: \(fromIndex) to index: \(toIndex)"
-        case let .update(value, index):
-            return "Update \(value) at index: \(index)"
+        case let .update(value, index, oldIndex):
+            return "Update \(value) at index: \(index) old index: \(oldIndex)"
         }
     }
 }
